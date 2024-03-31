@@ -39,17 +39,17 @@ def get_right_shift_grid():
     return right_grid
 
 def largest_rectangle(bars):
-	st, res = [], 0
-	for bar in bars + [-1]: # add -1 to have an additional iteration
-		step = 0
-		while st and st[-1][1] >= bar:
-			w, h = st.pop()
-			step += w
-			res = max(res, step * h)
+    st, res = [], 0
+    for bar in bars + [-1]: # add -1 to have an additional iteration
+        step = 0
+        while st and st[-1][1] >= bar:
+            w, h = st.pop()
+	    step += w
+	    res = max(res, step * h)
 
-		st.append((step + 1, bar))
+        st.append((step + 1, bar))
 
-	return res
+    return res
 
 def size_of_largest_parallelogram(grid):
     max_size = 0
