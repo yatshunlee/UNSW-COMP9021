@@ -8,62 +8,78 @@ def display_grid(grid):
     for row in grid:
         print('   ', *row)
 
-"""
-Intuition
-
-############ 11
-#########     8
-####          3
-##########    9
-
-i, j = 0, 0
-
-max_j = 11
-max_i =  3
-min([11, 8, 3, 9]) = 3
-argmin([11, 8, 3, 9]) = 2
-
-(3+1) * (2+1) = 12
-"""
-
 def get_left_shift_grid():
+    """
+    1100    001100
+    0110 => 001100 
+    0011    001100
+    """
     left_grid = []
     for i in range(dim):
         left_grid.append([0]*(dim-i-1) + grid[i] + [0]*i)
     return left_grid
 
 def get_right_shift_grid():
+    """
+    0011    001100
+    0110 => 001100 
+    1100    001100
+    """
     right_grid = []
     for i in range(dim):
         right_grid.append([0]*i + grid[i] + [0]*(dim-i-1))
     return right_grid
 
-def largest_rectangle(bars):
-    st, res = [], 0
-    for bar in bars + [-1]: # add -1 to have an additional iteration
-        step = 0
-        while st and st[-1][1] >= bar:
-            w, h = st.pop()
-	    step += w
-	    res = max(res, step * h)
+def largest_rectangle(widths):
+    """
+    Brute Force Solution
+    
+    Intuition
 
-        st.append((step + 1, bar))
+    ############ 11
+    #########     8
+    ####          3
+    ##########    9
 
-    return res
+    max_size = max([11, 2*8, 4*3, 4*4]) for (0, 0)
+    """
+    max_size = 0
+    for i in range(len(widths)):
+        tmp_max_size = widths[i]
+        min_w = widths[i]
+        h = 2
+        for j in range(i + 1, len(widths)):
+            min_w = min(min_w, widths[j])
+            tmp_max_size = max(tmp_max_size, h * min_w)
+            if min_w == 0:
+                break
+            h += 1
+        max_size = max(tmp_max_size, max_size)
+    return max_size
 
 def size_of_largest_parallelogram(grid):
     max_size = 0
+    # iterate over the grid and find every 1s. For every 1, find its max size
     for i in range(len(grid)):
         for j in range(len(grid[0])):
+            # if cell == 0 => skip
             if grid[i][j] == 0:
                 continue
+            # if cell == 1 however at the most RHS's index => skip
             if j == len(grid[0]) - 1:
                 continue
+            
+            # check if consecutive and how consecutive it is
             max_w = 1
             while j + max_w < len(grid[0]):
                 if grid[i][j+max_w] == 0:
                     break
                 max_w += 1
+            # check consecutive heights and store in following way
+            # "1"1110000 <= i'm currently at "1" i.e., (0, 0)
+            #  1 1000000 => [4,2,1] => represent the widths of each row
+            #  1 0000000
+            #  0 1111110
             max_h = 1
             widths = [max_w]
             while i + max_h < len(grid):
@@ -77,6 +93,7 @@ def size_of_largest_parallelogram(grid):
                 max_h += 1
             if len(widths) <= 1:
                 continue
+            # get the possible largest size of rectangle
             size = largest_rectangle(widths)
             # print(max_w, widths)
             # print("Top Left Cell:", (i, j), "with a maximum size of", size)
