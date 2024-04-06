@@ -24,15 +24,17 @@ def display_grid():
 # that make it with 2. We "colour" the second shape we find by
 # replacing all the 1s that make it with 3.
 def colour_shapes():
-    """use of dictionary"""
+    # iterate all the cells / nodes
     all_nodes = [(i, j) for i in range(dim) for j in range(dim) if i != 0 or j != 0]
-    visited = {}
+    visited = set()
     color = 1
+    # for every node, we can go to up down left right
+    # directions is a list of vectors
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     while len(all_nodes) > 0:
         new = all_nodes.pop(0)
-        visited = set()
         to_visit = [new]
+        # initially set it as on
         first = True
 
         while len(to_visit) > 0:
@@ -42,16 +44,21 @@ def colour_shapes():
             visited.add((i, j))
             if grid[i][j] != 1:
                 continue
+            # turn off the flag
             if first:
                 first = False
+                # new color then can be used
                 color += 1
+            # change the "color" in-place
             grid[i][j] = color
             for di, dj in directions:
-                # out of grid
+                # out of grid vertically
                 if i + di >= dim or i + di < 0:
                     continue
+                # out of grid horizontally
                 if j + dj >= dim or j + dj < 0:
                     continue
+                # only visit neighbor that is 1
                 if grid[i + di][j + dj] == 1:
                     if (i + di, j + dj) in visited:
                         continue
@@ -61,8 +68,8 @@ def colour_shapes():
 
 
 def max_number_of_spikes(nb_of_shapes):
-    """count spike"""
     res = {}
+    # count spikes for all discovered shapes
     for v in range(nb_of_shapes):
         v += 2
         res[v] = 0
@@ -72,23 +79,27 @@ def max_number_of_spikes(nb_of_shapes):
                     continue
                 res[v] += is_spike(i, j, v)
     return max(res.values())
-    # Replace pass above with your code
+    
 
 # Possibly define other functions here
 def is_spike(i, j, v):
     """
     determine if a cell is a spike
-    :return: True if no neighbor in the grid is 1.
+    :params: i, j: position of a cell
+    :para: v: the value of the shape to look for
+    :return: True if at most 1 neighbor in the grid is 1.
     """
     # vector of up, down, left, right
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     cnt = 0
     for di, dj in directions:
-        # out of grid
+        # out of grid vertically
         if i + di >= dim or i + di < 0:
             continue
+        # out of grid horizontally
         if j + dj >= dim or j + dj < 0:
             continue
+        # count neighbor
         if grid[i+di][j+dj] == v:
             if cnt == 1:
                 return 0
