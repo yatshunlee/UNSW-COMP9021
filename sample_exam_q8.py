@@ -66,6 +66,10 @@ def f(letters):
     with open(dictionary, 'r') as infile:
         words = sorted(infile.read().split('\n'))
 
+    # filter irrelevant (key step)
+    l_set = set(letters)
+    words = [w for w in words if len(set(w).difference(l_set))==0]
+
     def is_valid_pair(word1, word2, letters):
         word_set = word1 + word2
         return len(word_set) == len(letters) and set(word_set) == set(letters)
@@ -74,7 +78,7 @@ def f(letters):
         valid_pairs = []
         for i in range(len(dictionary)):
             word1 = dictionary[i]
-            for j in range(i+1, len(dictionary)):
+            for j in range(i + 1, len(dictionary)):
                 word2 = dictionary[j]
                 if is_valid_pair(word1, word2, letters):
                     pair = tuple(sorted([word1, word2]))
@@ -83,8 +87,27 @@ def f(letters):
                     valid_pairs.append(pair)
         return valid_pairs
 
-    words.sort()
     solutions = find_pairs(letters, words)
+
+    # d = {}
+    # for i in range(len(words)):
+    #     wd1 = words[i]
+    #     for j in range(i+1, len(words)):
+    #         wd2 = words[j]
+    #         wd_set = wd1 + wd2
+    #
+    #         n = len(wd_set)
+    #         s = set(wd_set)
+    #         s = tuple(sorted(list(s)))
+    #         d.setdefault(n, {})
+    #         d[n].setdefault(s, [])
+    #         d[n][s].append((wd1, wd2))
+    #
+    # ns = len(letters)
+    # ss = set(letters)
+    # ss = tuple(sorted(list(ss)))
+
+    # solutions = d.get(ns).get(ss)
 
     if not solutions:
         print('There is no solution')
@@ -95,6 +118,7 @@ def f(letters):
 
 
 if __name__ == '__main__':
+
     import doctest
 
     doctest.testmod()
