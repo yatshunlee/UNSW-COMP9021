@@ -26,10 +26,31 @@ def f(year):
     In 2013, maximum inflation was: 0.82
     It was achieved in the following months: Feb
     '''
-    months = 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     # Insert your code here
 
-
+    # Open the CSV file
+    o = []
+    with open('cpiai.csv', 'r') as file:
+        # Create a CSV reader object
+        csv_reader = csv.reader(file)
+        
+        # Iterate over each row in the CSV file
+        for row in csv_reader:
+            # Each row is a list of values representing the columns in that row
+            date, _, inflation = row
+            if date[:4] == str(year):
+                o.append(float(inflation))
+        
+    output_months = []
+    for i in range(len(o)):
+        if max(o) == o[i]:
+            output_months.append(months[i])
+    output_months = ', '.join(output_months)
+    print(f'In {year}, maximum inflation was: {max(o)}')
+    print(f'It was achieved in the following months: {output_months}')
+        
 if __name__ == '__main__':
+    
     import doctest
     doctest.testmod()
