@@ -144,7 +144,7 @@ class Maze:
             print('The maze has no gate.')
 
         ########### find pillars ############
-        pillars = []
+        self.pillars = []
         for i in range(0, len(self.maze_map), 2):
             for j in range(0, len(self.maze_map[0]), 2):
                 if self.maze_map[i][j] != ' ':
@@ -159,13 +159,13 @@ class Maze:
                 if i < len(self.maze_map) - 1 and j < len(self.maze_map[0]) - 1:
                     cnt += self.maze_map[i + 1][j + 1] == 'n'
                 if cnt == 4:
-                    pillars.append((i, j))
+                    self.pillars.append((i, j))
                 else:
                     cond = (i == 0 or i == len(self.maze_map) - 1) + (j == 0 or j == len(self.maze_map[0]) - 1)
                     if cond and cnt == 2:
-                        pillars.append((i, j))
+                        self.pillars.append((i, j))
                     elif cond == 2 and cnt == 1:
-                        pillars.append((i, j))
+                        self.pillars.append((i, j))
 
         ########### traverse the maze ###########
         node_gate_mapping = {}
@@ -404,9 +404,6 @@ class Maze:
                             to_visit.append((i + di * 2, j + dj * 2))
                         visited.add((i + di * 2, j + dj * 2))
 
-        # for row in self.maze_map:
-        #     print('  ', *row)
-
         if cul_de_sacs_cnt > 1:
             print('The maze has', cul_de_sacs_cnt, 'accessible cul-de-sacs that are all connected.')
         elif cul_de_sacs_cnt == 1:
@@ -439,7 +436,7 @@ class Maze:
                         to_visit_excess_nodes.append((i + di * 2, j + dj * 2))
                         excess_nodes_visited.add((i + di * 2, j + dj * 2))
 
-        unique_gate_pairs = []
+        self.unique_gate_pairs = []
         for start in gate_other_gates_mapping:
             if len(gate_other_gates_mapping[start]) == 1:
                 end = list(gate_other_gates_mapping[start])[0]
@@ -449,9 +446,10 @@ class Maze:
                         is_unique = False
                         break
                 if is_unique:
-                    unique_gate_pairs.append((start, end))
+                    path = [start] + gate_gate_mapping[(start, end)] + [end]
+                    self.unique_gate_pairs.append(path)
 
-        entry_exit_path_cnt = len(unique_gate_pairs)
+        entry_exit_path_cnt = len(self.unique_gate_pairs)
         if entry_exit_path_cnt > 1:
             print('The maze has', entry_exit_path_cnt, 'entry-exit paths with no intersections not to cul-de-sacs.')
         elif entry_exit_path_cnt == 1:
@@ -461,6 +459,9 @@ class Maze:
 
         
     def display(self):
+        # for row in self.maze_map:
+        #     print('  ', *row)
+
         output = ['\\documentclass[10pt]{article}',
                '\\usepackage{tikz}',
                '\\usetikzlibrary{shapes.misc}',
@@ -474,6 +475,41 @@ class Maze:
                '\\begin{center}',
                '\\begin{tikzpicture}[x=0.5cm, y=-0.5cm, ultra thick, blue]']
         output.append('% Walls')
-        # Write the content to a .tex file
-        with open(f'{self.fname[:-4]}123.tex', 'w') as file:
+        for i in range(0, len(self.maze_map), 2):
+            for j in range(0, len(self.maze_map[0]), 2):
+                if self.maze_map[i][j] != 'w':
+                    continue
+                if i != len(self.maze_map) - 1:
+                    if self.maze_map[i+1][j] == 'w':
+                        s = f"    \\draw ({j // 2},{i // 2}) -- ({j // 2},{i // 2 + 1});"
+                        output.append(s)
+                if j != len(self.maze_map[0]) - 1:
+                    if self.maze_map[i][j+1] == 'w':
+                        s = f"    \\draw ({j // 2},{i // 2}) -- ({j // 2 + 1},{i // 2});"
+                        output.append(s)
+        output.append('% Pillars')
+        for i, j in self.pillars:
+            s = f"    \\fill[green] ({j//2},{i//2}) circle(0.2);"
+            output.append(s)
+        output.append('% Inner points in accessible cul-de-sacs')
+        for i in range(len(self.maze_map)):
+            for j in range(len(self.maze_map[0])):
+                if self.maze_map[i][j] == 'x':
+                    s = f"    \\node at ({j/2},{i/2})" + " {};"
+                    output.append(s)
+        output.append('% Entry-exit paths without intersections')
+        for path in self.unique_gate_pairs:
+            for i in range(len(path)-1):
+                prev = path[i]
+                nxt = path[i+1]
+                s = f"    \\draw[dashed, yellow] ({prev[1]/2},{prev[0]/2}) -- ({nxt[1]/2},{nxt[0]/2});"
+                output.append(s)
+        ending = [
+            "",
+            "\\end{tikzpicture}",
+            "\\end{center}",
+            "\\vspace*{\\fill}",
+            "\\end{document}"]
+        output.extend(ending)
+        with open(f'{self.fname[:-4]}.tex', 'w') as file:
             file.write('\n'.join(output))
