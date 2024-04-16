@@ -1,7 +1,9 @@
 from pprint import pprint
 
+
 class MazeError(Exception):
     pass
+
 
 class MazeSolver:
     def __init__(self, maze, start, *, target_val=0, endpoints=None):
@@ -16,7 +18,7 @@ class MazeSolver:
     def traverse(self):
         pass
 
-    
+
 class Maze:
     def __init__(self, fname):
         self.fname = fname
@@ -31,7 +33,7 @@ class Maze:
                 if char in ['0', '1', '2', '3']:
                     row.append(char)
                 elif char != ' ':
-                    raise MazeError('Incorrect input') # contains not only {0, 1, 2, 3, space}
+                    raise MazeError('Incorrect input')  # contains not only {0, 1, 2, 3, space}
             # store nonempty row / line
             if len(row):
                 self.edges.append(row)
@@ -39,11 +41,11 @@ class Maze:
 
         for i in range(len(self.edges)):
             if i != 0 and len(self.edges[i]) != len(self.edges[0]):
-                raise MazeError('Incorrect input') # inconsistency
+                raise MazeError('Incorrect input')  # inconsistency
             if self.edges[i][-1] in ['1', '3']:
-                raise MazeError("Input does not represent a maze.") # >=1 lines contains 1 or 3 at last digit
+                raise MazeError("Input does not represent a maze.")  # >=1 lines contains 1 or 3 at last digit
         if '2' in self.edges[-1] or '3' in self.edges[-1]:
-            raise MazeError("Input does not represent a maze.") # >=1 lines contains 2 or 3 at last row
+            raise MazeError("Input does not represent a maze.")  # >=1 lines contains 2 or 3 at last row
         if len(self.edges) < 2 or len(self.edges) > 41:
             raise MazeError('Incorrect input')  # too few or many nonblank lines
         if len(self.edges[0]) < 2 or len(self.edges[0]) > 31:
@@ -88,7 +90,7 @@ class Maze:
                 self.maze[i * 2 + 2][j * 2 + 0] = max(self.maze[i * 2 + 2][j * 2 + 0], x)
                 self.maze[i * 2 + 2][j * 2 + 1] = max(self.maze[i * 2 + 2][j * 2 + 1], y)
                 self.maze[i * 2 + 2][j * 2 + 2] = max(self.maze[i * 2 + 2][j * 2 + 2], z)
-                
+
         for i in range(len(self.edges) - 1):
             if self.edges[i][-1] == '2':
                 a, b, c = 1, 1, 1
@@ -118,8 +120,7 @@ class Maze:
                     row.append('n')
             self.maze_map.append(row)
 
-
-    def analyze(self):
+    def analyse(self):
         ########### gate counting ###########
         all_gates = []
         # check left and right edges
@@ -127,14 +128,14 @@ class Maze:
             if self.maze[i][0] == 0:
                 all_gates.append((i, 0))
             if self.maze[i][-1] == 0:
-                all_gates.append((i, len(self.maze[0])-1))
+                all_gates.append((i, len(self.maze[0]) - 1))
         # check top and bottom edges
         for j in range(1, len(self.maze[0]), 2):
             if self.maze[0][j] == 0:
                 all_gates.append((0, j))
             if self.maze[-1][j] == 0:
-                all_gates.append((len(self.maze)-1, j))
-                
+                all_gates.append((len(self.maze) - 1, j))
+
         gate_cnt = len(all_gates)
         if gate_cnt > 1:
             print('The maze has', gate_cnt, 'gates.')
@@ -187,7 +188,7 @@ class Maze:
 
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         visited = set()
-        gate_gate_mapping = {} # (start, end): nodes in between
+        gate_gate_mapping = {}  # (start, end): nodes in between
         gate_cds_mapping = {}
 
         gate_other_gates_mapping = {}
@@ -208,8 +209,8 @@ class Maze:
                 wall_cnt = 0
                 intersection_cnt = 0
                 for di, dj in directions:
-                    if i+di == 0 or i+di == len(self.maze) - 1 or j+dj == 0 or j+dj == len(self.maze[0]) - 1:
-                        if gate_node_mapping.get((i + di, j + dj)): # if is gate
+                    if i + di == 0 or i + di == len(self.maze) - 1 or j + dj == 0 or j + dj == len(self.maze[0]) - 1:
+                        if gate_node_mapping.get((i + di, j + dj)):  # if is gate
                             intersection_cnt += 1
                             end = (i + di, j + dj)
                             if start == end:
@@ -218,7 +219,7 @@ class Maze:
                             gate_other_gates_mapping.setdefault(start, set())
                             gate_other_gates_mapping[start].add(end)
 
-                        else: # then is a wall
+                        else:  # then is a wall
                             wall_cnt += 1
 
                     elif self.maze[i + di][j + dj] == 0:
@@ -269,7 +270,7 @@ class Maze:
                         continue
                     if (i + di, j + dj) in wall_visited:
                         continue
-                    if self.maze_map[i+di][j+dj] == 'w':
+                    if self.maze_map[i + di][j + dj] == 'w':
                         to_visit_wall.append((i + di, j + dj))
                         wall_visited.add((i + di, j + dj))
             wall_cnt += 1
@@ -299,7 +300,7 @@ class Maze:
             print('The maze has walls that are all connected.')
         else:
             print('The maze has no wall.')
-        
+
         ########### inaccessible inner points counting ###########
         inaccessible_area_cnt = len(inaccessible_nodes)
         if inaccessible_area_cnt > 1:
@@ -308,7 +309,7 @@ class Maze:
             print('The maze has a unique inaccessible inner point.')
         else:
             print('The maze has no inaccessible inner point.')
-        
+
         ########### accessible areas counting ###########
         if accessible_areas_cnt > 1:
             print('The maze has', accessible_areas_cnt, 'accessible areas.')
@@ -316,101 +317,77 @@ class Maze:
             print('The maze has a unique accessible area.')
         else:
             print('The maze has no accessible area.')
-        
+
         ########### accessible cul-de-sacs counting ###########
+        cul_de_sacs_cnt = 0
+        cul_de_sacs = []
         for gc in gate_cds_mapping:
             start, end = gc
-            for interstep in gate_cds_mapping[gc]:
-                i, j = interstep
-                self.maze_map[i][j] = 'x'
-
-        for gg in gate_gate_mapping:
-            for interstep in gate_gate_mapping[gg]:
-                i, j = interstep
-                if interstep in intersections:
-                    # print(interstep, '>>', end=' ')
-                    self.maze_map[i][j] = 'i'
-                else:
-                    self.maze_map[i][j] = 'y'
-
-        visit_again_nodes = []
-        for i in range(len(self.maze_map)):
-            for j in range(len(self.maze_map[0])):
-                if (i, j) in inaccessible_nodes:
+            cul_de_sacs.append(end)
+            for interstep in gate_cds_mapping[gc][::-1]:
+                existing_intersection_cnt = 0
+                if interstep not in intersections:
+                    cul_de_sacs.append(interstep)
                     continue
-                if self.maze_map[i][j] == 'n':
-                    visit_again_nodes.append((i, j))
-
-        visited_again = set()
-        for node in visit_again_nodes:
-            if node in visited_again:
-                continue
-            visited_again.add(node)
-            to_visit_again = [node]
-            record = {node}
-            is_x = True
-            while len(to_visit_again):
-                i, j = to_visit_again.pop()
-                record.add((i, j))
-                for di, dj in directions:
-                    if i+di == 0 or i+di == len(self.maze) - 1 or j+dj == 0 or j+dj == len(self.maze[0]) - 1:
-                        is_gate = gate_node_mapping.get((i + di, j + dj))
-                        if is_gate:
-                            is_x = False
-
-                    elif self.maze[i + di][j + dj] == 0:
-                        if (i + di * 2, j + dj * 2) in visited_again:
-                            continue
-                        if self.maze_map[i + di * 2][j + dj * 2] == 'n':
-                            to_visit_again.append((i + di * 2, j + dj * 2))
-                            visited_again.add((i + di * 2, j + dj * 2))
-                        if self.maze_map[i + di * 2][j + dj * 2] in ['y', 'i']:
-                            is_x = False
-
-            for node in record:
-                i, j = node
-                if is_x:
-                    self.maze_map[i][j] = 'x'
                 else:
-                    self.maze_map[i][j] = 'y'
+                    i, j = interstep
+                    for di, dj in directions:
+                        # if near gate
+                        if i + di == 0 or i + di == len(self.maze) - 1 or j + dj == 0 or j + dj == len(self.maze[0]) - 1:
+                            is_gate = gate_node_mapping.get((i + di, j + dj))
+                            if is_gate:
+                                existing_intersection_cnt += 1
+                        elif self.maze[i + di][j + dj] == 0:
+                            if (i + di * 2, j + dj * 2) in cul_de_sacs:
+                                continue
+                            existing_intersection_cnt += 1
 
-        visited = set()
-        cul_de_sacs_cnt = 0
-        for start in all_gates:
+                    if existing_intersection_cnt == 1:
+                        cul_de_sacs.append(interstep)
+                    else:
+                        break
+
+        cul_de_sacs = set(cul_de_sacs)
+        for i, j in cul_de_sacs:
+            self.maze_map[i][j] = 'x'
+
+        cul_de_sacs_entrances = set()
+        cul_de_sacs_visited = set()
+        for gc in gate_cds_mapping:
+            start, _ = gc
             node = gate_node_mapping[start]
-            if node in visited:
+            if node in cul_de_sacs_visited:
                 continue
-            visited.add(node)
+            cul_de_sacs_visited.add(node)
             i, j = node
             if self.maze_map[i][j] == 'x':
-                cul_de_sacs_cnt += 1
+                cul_de_sacs_entrances.add((i, j))
                 continue
-            to_visit = [node]
-            while len(to_visit):
-                i, j = to_visit.pop(0)
+            cul_de_sacs_to_visit = [node]
+            while len(cul_de_sacs_to_visit):
+                i, j = cul_de_sacs_to_visit.pop()
                 for di, dj in directions:
                     if i + di == 0 or i + di == len(self.maze) - 1 or j + dj == 0 or j + dj == len(self.maze[0]) - 1:
-                        if gate_node_mapping.get((i + di, j + dj)):  # if is gate
-                            end = (i + di, j + dj)
-                            if start == end:
-                                continue
+                        continue
 
                     elif self.maze[i + di][j + dj] == 0:
-                        if (i + di * 2, j + dj * 2) in visited:
+                        if (i + di * 2, j + dj * 2) in cul_de_sacs_visited:
                             continue
                         if self.maze_map[i + di * 2][j + dj * 2] == 'x':
-                            cul_de_sacs_cnt += 1
+                            cul_de_sacs_entrances.add((i + di * 2, j + dj * 2))
                         else:
-                            to_visit.append((i + di * 2, j + dj * 2))
-                        visited.add((i + di * 2, j + dj * 2))
+                            cul_de_sacs_to_visit.append((i + di * 2, j + dj * 2))
+                        cul_de_sacs_visited.add((i + di * 2, j + dj * 2))
 
+
+        cul_de_sacs_cnt = len(cul_de_sacs_entrances)
         if cul_de_sacs_cnt > 1:
             print('The maze has', cul_de_sacs_cnt, 'accessible cul-de-sacs that are all connected.')
         elif cul_de_sacs_cnt == 1:
             print('The maze has accessible cul-de-sacs that are all connected.')
         else:
             print('The maze has no accessible cul-de-sac.')
-        
+
         ########### entry exit path counting ###########
         excess_nodes_visited = set()
         non_unique_gates_groups = {}
@@ -423,9 +400,9 @@ class Maze:
             while len(to_visit_excess_nodes):
                 i, j = to_visit_excess_nodes.pop()
                 for di, dj in directions:
-                    if i+di == 0 or i+di == len(self.maze) - 1 or j+dj == 0 or j+dj == len(self.maze[0]) - 1:
+                    if i + di == 0 or i + di == len(self.maze) - 1 or j + dj == 0 or j + dj == len(self.maze[0]) - 1:
                         is_gate = gate_node_mapping.get((i + di, j + dj))
-                        if is_gate: # if is gate
+                        if is_gate:  # if is gate
                             non_unique_gates_groups[node].append((i + di, j + dj))
 
                     elif self.maze[i + di][j + dj] == 0:
@@ -457,52 +434,51 @@ class Maze:
         else:
             print('The maze has no entry-exit path with no intersection not to cul-de-sacs.')
 
-        
     def display(self):
         # for row in self.maze_map:
         #     print('  ', *row)
 
         output = ['\\documentclass[10pt]{article}',
-               '\\usepackage{tikz}',
-               '\\usetikzlibrary{shapes.misc}',
-               '\\usepackage[margin=0cm]{geometry}',
-               '\\pagestyle{empty}',
-               '\\tikzstyle{every node}=[cross out, draw, red]',
-               '',
-               '\\begin{document}',
-               '',
-               '\\vspace*{\\fill}',
-               '\\begin{center}',
-               '\\begin{tikzpicture}[x=0.5cm, y=-0.5cm, ultra thick, blue]']
+                  '\\usepackage{tikz}',
+                  '\\usetikzlibrary{shapes.misc}',
+                  '\\usepackage[margin=0cm]{geometry}',
+                  '\\pagestyle{empty}',
+                  '\\tikzstyle{every node}=[cross out, draw, red]',
+                  '',
+                  '\\begin{document}',
+                  '',
+                  '\\vspace*{\\fill}',
+                  '\\begin{center}',
+                  '\\begin{tikzpicture}[x=0.5cm, y=-0.5cm, ultra thick, blue]']
         output.append('% Walls')
         for i in range(0, len(self.maze_map), 2):
             for j in range(0, len(self.maze_map[0]), 2):
                 if self.maze_map[i][j] != 'w':
                     continue
                 if i != len(self.maze_map) - 1:
-                    if self.maze_map[i+1][j] == 'w':
+                    if self.maze_map[i + 1][j] == 'w':
                         s = f"    \\draw ({j // 2},{i // 2}) -- ({j // 2},{i // 2 + 1});"
                         output.append(s)
                 if j != len(self.maze_map[0]) - 1:
-                    if self.maze_map[i][j+1] == 'w':
+                    if self.maze_map[i][j + 1] == 'w':
                         s = f"    \\draw ({j // 2},{i // 2}) -- ({j // 2 + 1},{i // 2});"
                         output.append(s)
         output.append('% Pillars')
         for i, j in self.pillars:
-            s = f"    \\fill[green] ({j//2},{i//2}) circle(0.2);"
+            s = f"    \\fill[green] ({j // 2},{i // 2}) circle(0.2);"
             output.append(s)
         output.append('% Inner points in accessible cul-de-sacs')
         for i in range(len(self.maze_map)):
             for j in range(len(self.maze_map[0])):
                 if self.maze_map[i][j] == 'x':
-                    s = f"    \\node at ({j/2},{i/2})" + " {};"
+                    s = f"    \\node at ({j / 2},{i / 2})" + " {};"
                     output.append(s)
         output.append('% Entry-exit paths without intersections')
         for path in self.unique_gate_pairs:
-            for i in range(len(path)-1):
+            for i in range(len(path) - 1):
                 prev = path[i]
-                nxt = path[i+1]
-                s = f"    \\draw[dashed, yellow] ({prev[1]/2},{prev[0]/2}) -- ({nxt[1]/2},{nxt[0]/2});"
+                nxt = path[i + 1]
+                s = f"    \\draw[dashed, yellow] ({prev[1] / 2},{prev[0] / 2}) -- ({nxt[1] / 2},{nxt[0] / 2});"
                 output.append(s)
         ending = [
             "",
