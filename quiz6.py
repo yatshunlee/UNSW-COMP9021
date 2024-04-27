@@ -25,7 +25,7 @@ def display_grid():
 # replacing all the 1s that make it with 3.
 def colour_shapes():
     # iterate all the cells / nodes
-    all_nodes = [(i, j) for i in range(dim) for j in range(dim) if i != 0 or j != 0]
+    all_nodes = [(i, j) for i in range(dim) for j in range(dim)]
     visited = set()
     color = 1
     # for every node, we can go to up down left right
